@@ -4,14 +4,14 @@
 
 using namespace std;
 
-const int R = 1;    // 反距离的幂值
+const int R = 2;    // 反距离的幂值
 
 class Point
 {
 public:
     double x;       // 横坐标
     double y;       // 纵坐标
-    double z;       // 高度
+    double z;       // 高程值
     double d;       // 到插值点的距离
     double w;       // 权重
 
@@ -30,24 +30,24 @@ int n;                  // 采样点个数
 vector<Point> arr;      // 采样点数组
 double x, y, z;         // 插值点
 
-void distance()         // 计算插值点到采样点的距离 d
+void distance()         
 {
-    for(int i = 0; i < n; i++)
+    for(int i = 0; i < arr.size(); i++)
         arr[i].d = sqrt(pow(arr[i].x - x, 2) + pow(arr[i].y - y, 2)); 
 }
 
-void weight()           // 计算各采样点的权重
+void weight()   
 {
-    double sum = 0;
-    for(int i = 0; i < n; i++)
-        sum += pow(1 / arr[i].d, R);
-    for(int i = 0; i < n; i++)
-        arr[i].w = pow(1 / arr[i].d, R) / sum;
+    double sum = 0;                            // 权之和
+    for(int i = 0; i < arr.size(); i++)     
+        sum += pow(arr[i].d, -R);
+    for(int i = 0; i < arr.size(); i++)        // 权归一化后为权重
+        arr[i].w = pow(arr[i].d, -R) / sum;
 }
 
-void get()              // 根据权重计算加权和
+void get_z()             
 {
-    for(int i = 0; i < n; i++)
+    for(int i = 0; i < arr.size(); i++)
         z += arr[i].w * arr[i].z;
 }
 
@@ -60,20 +60,20 @@ int main()
         double a, b, c;
         cin >> a >> b >> c;
 
-        Point t(a, b, c, -1, -1);
-        arr.push_back(t);
+        arr.push_back({a, b, c, -1, -1});
     }
 
-    cin >> x >> y;
+	while(cin >> x >> y)
+	{
+		distance();
 
-    distance();
+		weight();
 
-    weight();
+		get_z();
 
-    get();
-
-    cout << x << " " << y << " " << z << endl;
-
+	    cout << x << " " << y << " " << z << endl;
+	}
+	
     return 0;
 }
 
@@ -85,5 +85,8 @@ int main()
 110 170 110.5
 90 190 107.2
 180 210 131.78
-110 150
+110 150 
+
+res:
+110 150 113.595
 */
